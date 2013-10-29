@@ -1,16 +1,11 @@
 <?php
 
 /**
- * Class UBGravatar
+ * Class UBSocial
  *
- * Allows for handliing Gravatar stuff
- *
- * @link http://en.gravatar.com/
- * @version 0.1
  */
-class UBGravatar
+class UBSocial
 {
-
 	/**
 	 * @param        email
 	 * @param int    size Size in pixels
@@ -23,7 +18,7 @@ class UBGravatar
 	 * @todo NOT TESTED
 	 * @return string
 	 */
-	public static function getGravatar( $email, $size = 50, $default = 'monsterid', $rating = 'x' )
+	public static function gravatar( $email, $size = 50, $default = 'monsterid', $rating = 'x' )
 	{
 		$email   = md5( strtolower( trim( $email ) ) );
 		$imgUrl = 'http://www.gravatar.com/avatar/' . $email . '?s=' . $size . '&d=' . $default . '&r=' . $rating;

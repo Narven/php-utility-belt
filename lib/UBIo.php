@@ -97,40 +97,6 @@ class UBIo
 	}
 
 	/**
-	 * Checks if exists and generates the url for the user avatar
-	 *
-	 * @param $id sha1(userid)
-	 *
-	 * @return string
-	 */
-	public static function getAvatar( $id )
-	{
-		$avatarDefaultUrl = Yii::app()->getBaseUrl( true ) . MEDIA_URL . 'default/avatar.png';
-
-		//return $avatarDefaultUrl;
-
-		if( !$id )
-		{
-			return $avatarDefaultUrl;
-		}
-		else
-		{
-			$avatar = MEDIA_URI . $id . '.png';
-
-			if( file_exists( $avatar ) )
-			{
-
-				return Yii::app()->getBaseUrl( true ) . MEDIA_URL . $id . '.png';
-			}
-			else
-			{
-				return $avatarDefaultUrl;
-			}
-		}
-
-	}
-
-	/**
 	 * Function: recursiveGlob
 	 * Recursively goes through a folder and returns all files.
 	 *
@@ -177,7 +143,7 @@ class UBIo
 	 * @param string $country
 	 * @param string $postalcode
 	 *
-	 * @example BCIo::googleHTTPGeocoding('1 Sir Winston Churchill Square', 'edmonton', 'alberta', 'canada', 'T5J 2R7');
+	 * @example UBIo::googleHTTPGeocoding('1 Sir Winston Churchill Square', 'edmonton', 'alberta', 'canada', 'T5J 2R7');
 	 *
 	 * @return string
 	 */
@@ -198,5 +164,48 @@ class UBIo
 		// Output the coordinates
 		return "Longitude: $longitude, Latitude: $latitude";
 
+	}
+
+	/**
+	 * Returns new array and preserves until a specific line is found in the old one.
+	 * Ideal for rewriting config files with dynamic content, but still allowing
+	 * custom rules above that.
+	 *
+	 * Tip, in combination with file(), consider using the FILE_IGNORE_NEW_LINES flag
+	 *
+	 * @param array  $original
+	 * @param array  $dynamic
+	 * @param string $splitLine
+	 *
+	 * @return array
+	 */
+	public static function preserveUntil( $original = array(), $dynamic = array(), $splitLine = "# PLEASE DO NOT EDIT BELOW THIS LINE! #" )
+	{
+		$new = array();
+
+		$splitLineAt = false;
+		foreach( $original as $n => $line )
+		{
+			if( trim( $line ) == trim( $splitLine ) )
+			{
+				$splitLineAt = $n;
+				break;
+			}
+		}
+
+		if( is_numeric( $splitLineAt ) )
+		{
+			$new = array_slice( $original, 0, ( $splitLineAt ) );
+		}
+		else
+		{
+			// Failsafe. No splitLine found. Preserve entire original.
+			$new = $original;
+		}
+
+		$new[ ] = $splitLine;
+		$new    = array_merge( $new, $dynamic );
+
+		return $new;
 	}
 }

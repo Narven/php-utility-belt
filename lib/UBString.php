@@ -21,7 +21,7 @@ class UBString
 	 *
 	 * @return bool|string
 	 */
-	public static function CamelCase( $str = false )
+	public static function camelCase( $str = false )
 	{
 		if( !$str )
 		{
@@ -40,11 +40,13 @@ class UBString
 	}
 
 	/**
+	 * Generates a random string
+	 *
 	 * @param int $length
 	 *
 	 * @return string
 	 */
-	public static function RandomString( $length = 8 )
+	public static function randomString( $length = 8 )
 	{
 		// start with a blank password
 		$password = "";
@@ -169,7 +171,7 @@ class UBString
 	 *
 	 * @return mixed boolean or string
 	 */
-	public static function strBetween( $haystack, $left, $right, $include_needles = false, $case_sensitive = true )
+	public static function between( $haystack, $left, $right, $include_needles = false, $case_sensitive = true )
 	{
 		// Set parameters
 		$left      = preg_quote( $left );
@@ -232,7 +234,7 @@ class UBString
 	 *
 	 * @return string
 	 */
-	public static function strShift( $delimiter, &$string )
+	public static function shift( $delimiter, &$string )
 	{
 		// Explode into parts
 		$parts = explode( $delimiter, $string );
@@ -293,7 +295,7 @@ class UBString
 	 *
 	 * @return bool True if $str fits a UTF-8 model, false otherwise.
 	 */
-	public static function seemsUtf8( $str )
+	public static function isUtf8Encoded( $str )
 	{
 		$length = strlen( $str );
 		for( $i = 0; $i < $length; $i++ )
@@ -568,7 +570,7 @@ class UBString
 	/**
 	 * Sanitizes title
 	 */
-	public static function sanitizeTitle( $title )
+	public static function sanitize( $title )
 	{
 		$title = self::remove_accents( $title );
 		$title = strip_tags( $title );
@@ -645,4 +647,5 @@ class UBString
 		return $excerpt . $extension;
 
 	}
+
 }

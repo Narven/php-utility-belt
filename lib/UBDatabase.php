@@ -9,13 +9,9 @@ class UBDatabase
 	 * @param $dest
 	 * @param $options
 	 *
-	 * @internal param $ <type> $source
-	 * @internal param $ <type> $dest
-	 * @internal param $ <type> $options
-	 *
 	 * @return bool|float <type>
 	 */
-	public static function mysqlCopyTable( $source, $dest, $options )
+	public static function copyTable( $source, $dest, $options )
 	{
 		if( !isset( $options[ 'data' ] ) )
 		{

@@ -1,14 +1,14 @@
 <?php
 
 /**
- * Class UBJson
+ * Class UBFormat
  *
  * Helpers for json related stuff
  * @version 0.1
  */
-class UBJson
+class UBFormat
 {
-	public static function toJsonp( $data )
+	public static function json2Jsonp( $data )
 	{
 		$data = json_encode( $data );
 

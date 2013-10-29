@@ -112,6 +112,12 @@ class UBDatetime
 		return implode( ", ", $times );
 	}
 
+	/**
+	 * convert2CustomDatetime Converts a datetime format to another format
+	 * @param  [type] $datetime
+	 * @param  string $format
+	 * @return [type]
+	 */
 	function convert2CustomDatetime( $datetime, $format = "Y-m-d G:i:s" )
 	{
 		if( !isset( $datetime ) || empty( $datetime ) )

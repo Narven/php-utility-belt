@@ -18,7 +18,7 @@ class UBArray
 	 * @link   https://github.com/kvz/kvzlib/blob/master/php/functions/arrayExtract1.inc.php
 	 * @return mixed boolean on failure or array on success
 	 */
-	public static function arrayExtract1( $array )
+	public static function extractFirstLevel( $array )
 	{
 		$newArray = array();
 		if( !is_array( $array ) )
@@ -50,7 +50,7 @@ class UBArray
 	 *
 	 * @return array Merged array
 	 */
-	public static function arrayMerge( $arr1, $arr2 = null )
+	public static function merge( $arr1, $arr2 = null )
 	{
 		$args = func_get_args();
 
@@ -65,7 +65,7 @@ class UBArray
 			{
 				if( is_array( $val ) && isset( $r[ $key ] ) && is_array( $r[ $key ] ) )
 				{
-					$r[ $key ] = arrayMerge( $r[ $key ], $val );
+					$r[ $key ] = self::merge( $r[ $key ], $val );
 				}
 				elseif( is_int( $key ) )
 				{
@@ -91,7 +91,7 @@ class UBArray
 	 *
 	 * @return mixed boolean on failure or array on success
 	 */
-	public static function arraySquash( $array, $useKey = null, $useVal = null )
+	public static function squash( $array, $useKey = null, $useVal = null )
 	{
 		if( !is_array( $array ) )
 		{
@@ -183,7 +183,7 @@ class UBArray
 	 *
 	 * @return boolean
 	 */
-	public static function keyExistsTree( $needle, $haystack )
+	public static function find( $needle, $haystack )
 	{
 		if( !is_array( $haystack ) )
 		{
@@ -291,7 +291,7 @@ class UBArray
 	 *
 	 * @return bool
 	 */
-	public static function sortTree( &$array )
+	public static function sort( &$array )
 	{
 		if( !is_array( $array ) )
 		{
@@ -307,114 +307,4 @@ class UBArray
 		return true;
 	}
 
-	/**
-	 * Returns new array and preserves until a specific line is found in the old one.
-	 * Ideal for rewriting config files with dynamic content, but still allowing
-	 * custom rules above that.
-	 *
-	 * Tip, in combination with file(), consider using the FILE_IGNORE_NEW_LINES flag
-	 *
-	 * @param array  $original
-	 * @param array  $dynamic
-	 * @param string $splitLine
-	 *
-	 * @return array
-	 */
-	public static function preserveUntil( $original = array(), $dynamic = array(), $splitLine = "# PLEASE DO NOT EDIT BELOW THIS LINE! #" )
-	{
-		$new = array();
-
-		$splitLineAt = false;
-		foreach( $original as $n => $line )
-		{
-			if( trim( $line ) == trim( $splitLine ) )
-			{
-				$splitLineAt = $n;
-				break;
-			}
-		}
-
-		if( is_numeric( $splitLineAt ) )
-		{
-			$new = array_slice( $original, 0, ( $splitLineAt ) );
-		}
-		else
-		{
-			// Failsafe. No splitLine found. Preserve entire original.
-			$new = $original;
-		}
-
-		$new[ ] = $splitLine;
-		$new    = array_merge( $new, $dynamic );
-
-		return $new;
-	}
-
-	/**
-	 * Select of set of elements by some possibility, simple try this function.
-	 *
-	 * @param     $elements
-	 * @param int $n
-	 *
-	 * @link https://coderwall.com/p/hji52q?&p=5&q=
-	 *
-	 * @return array
-	 */
-	public static function getByPossibility( $elements, $n = 1 )
-	{
-
-		$selected = array();
-
-		if( !empty( $elements ) )
-		{
-
-			$possibility = 0;
-
-			foreach( $elements as $element )
-			{
-				$possibility += $element->possibility;
-			}
-
-			while( count( $selected ) < $n )
-			{
-
-				$sum  = 0;
-				$rand = rand() / getrandmax();
-
-				foreach( $elements as $element )
-				{
-
-					$sum += $element->possibility / $possibility;
-
-					if( $sum > $rand )
-					{
-
-						$selected[ ] = $element;
-						break;
-
-					}
-
-				}
-
-			}
-
-		}
-
-		return $selected;
-
-	}
-
-	/**
-	 * Removs duplicated keys from array
-	 *
-	 * @param array $arr
-	 *
-	 * @return array
-	 *
-	 * @deprecated Use array_unique() http://pt2.php.net/manual/en/function.array-unique.php
-	 */
-	public static function removeDuplicateKeys( array $arr )
-	{
-		return array_flip( array_flip( $arr ) );
-	}
 }
