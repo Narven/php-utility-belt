@@ -648,4 +648,279 @@ class UBString
 
 	}
 
+	/**
+	 * Extract keywords from a webpage
+	 *
+	 * @param url|null $url
+	 * @param string   $what
+	 *
+	 * @return array
+	 * @todo not tested
+	 * @link http://www.catswhocode.com/blog/useful-snippets-for-php-developers
+	 */
+	public static function extractMetaFromUrl( $url = null, $what = 'keywords' )
+	{
+		$meta = get_meta_tags( $url );
+
+		$keywords = $meta[ $what ];
+
+		// Split keywords
+		$keywords = explode( ',', $keywords );
+
+		// Trim them
+		$keywords = array_map( 'trim', $keywords );
+
+		// Remove empty values
+		$keywords = array_filter( $keywords );
+
+		return $keywords;
+	}
+
+	/**
+	 * Find All Links on a Page
+	 *
+	 * @param null $url
+	 *
+	 * @return void
+	 * @link http://www.catswhocode.com/blog/useful-snippets-for-php-developers
+	 */
+	public static function getAllLinksInPage( $url = null )
+	{
+		$html = file_get_contents( $url );
+
+		$dom = new DOMDocument();
+		@$dom->loadHTML( $html );
+
+		// grab all the on the page
+		$xpath = new DOMXPath( $dom );
+		$hrefs = $xpath->evaluate( "/html/body//a" );
+
+		for( $i = 0; $i < $hrefs->length; $i++ )
+		{
+			$href = $hrefs->item( $i );
+			$url  = $href->getAttribute( 'href' );
+			echo $url . '<br />';
+		}
+	}
+
+	/**
+	 * Add (th, st, nd, rd, th) to the end of a number
+	 *
+	 * @param $value
+	 *
+	 * @return string
+	 */
+	public static function ordinal( $value )
+	{
+		$test_c = abs( $value ) % 10;
+		$ext    = ( ( abs( $value ) % 100 < 21 && abs( $value ) % 100 > 4 ) ? 'th'
+			: ( ( $test_c < 4 ) ? ( $test_c < 3 ) ? ( $test_c < 2 ) ? ( $test_c < 1 )
+				? 'th' : 'st' : 'nd' : 'rd' : 'th' ) );
+
+		return $value . $ext;
+	}
+
+	/**
+	 * Automatic mailto links
+	 *
+	 * The following snippet looks for an email address in a string,
+	 * and replace it by a mailto link. Pretty useful on private
+	 * applications, but for obvious spamming reason I do not
+	 * recommend using this on a website, blog or forum.
+	 *
+	 * @param string $stringa
+	 *
+	 * @return string
+	 */
+	public static function stringToMailTo( $stringa = '' )
+	{
+		// $stringa = "This should format my email address example@domain.com";
+
+		$pattern = "/([a-z0-9][_a-z0-9.-]+@([0-9a-z][_0-9a-z-]+\.)+[a-z]{2,6})/i";
+		$replace = "\\1";
+		$text    = preg_replace( $pattern, $replace, $stringa );
+
+		return htmlspecialchars( $text );
+	}
+
+	/**
+	 * Simple random quote generator.
+	 *
+	 * @param $quote
+	 */
+	public static function randomQuote( $quote )
+	{
+		/*
+		 $quote = array(
+			1 => 'Quote 1',
+			2 => 'Quote 2',
+			3 => 'Quote 3',
+			4 => 'Quote 4',
+			5 => 'Quote 5',
+		);
+		 */
+		srand( (double)microtime() * 1000000 );
+		$randnum = rand( 1, count( $quote ) );
+
+		echo $quote[ $randnum ];
+	}
+
+	/**
+	 * Cleaning a string
+	 *
+	 * @param $string
+	 *
+	 * @link http://www.emoticode.net/php/cleaning-a-string.html
+	 *
+	 * @return mixed|string
+	 */
+	public static function clean( $string )
+	{
+		//$string = strtolower($string);
+
+		// Fix german special chars
+		$string = preg_replace( '/[Ã¤Ã„]/', 'ae', $string );
+		$string = preg_replace( '/[Ã¼Ãœ]/', 'ue', $string );
+		$string = preg_replace( '/[Ã¶Ã–]/', 'oe', $string );
+		$string = preg_replace( '/[ÃŸ]/', 'ss', $string );
+
+		// Replace other special chars
+		$specialCharacters = array(
+			'#'   => 'sharp',
+			'$'   => 'dollar',
+			'%'   => 'prozent', //'percent',
+			'&'   => 'und', //'and',
+			'@'   => 'at',
+			'.'   => 'punkt', //'dot',
+			'â‚¬' => 'euro',
+			'+'   => 'plus',
+			'='   => 'gleich', //'equals',
+			'Â§'  => 'paragraph',
+		);
+
+		while( list( $character, $replacement ) = each( $specialCharacters ) )
+		{
+			$string = str_replace( $character, '-' . $replacement . '-', $string );
+		}
+
+		$string = strtr( $string,
+			"Ã€ÃÃ‚ÃƒÃ„Ã…Ã Ã¡Ã¢Ã£Ã¤Ã¥Ã’Ã“Ã”Ã•Ã–Ã˜Ã²Ã³Ã´ÃµÃ¶Ã¸ÃˆÃ‰ÃŠÃ‹Ã¨Ã©ÃªÃ«Ã‡Ã§ÃŒÃÃŽÃÃ¬Ã­Ã®Ã¯Ã™ÃšÃ›ÃœÃ¹ÃºÃ»Ã¼Ã¿Ã‘Ã±",
+			"AAAAAAaaaaaaOOOOOOooooooEEEEeeeeCcIIIIiiiiUUUUuuuuyNn"
+		);
+
+		// Remove all remaining other unknown characters
+		$string = preg_replace( '/[^a-zA-Z0-9\-]/', '-', $string );
+		$string = preg_replace( '/^[\-]+/', '', $string );
+		$string = preg_replace( '/[\-]+$/', '', $string );
+		$string = preg_replace( '/[\-]{2,}/', '-', $string );
+
+		return $string;
+	}
+
+	/**
+	 * Truncate String
+	 *
+	 * @param $string
+	 * @param $maxlength
+	 * @param $extension
+	 *
+	 * @return array|string
+	 * @link http://www.emoticode.net/php/truncate-string-2.html
+	 */
+	public static function truncate( $string, $maxlength, $extension )
+	{
+
+		// Set the replacement for the "string break" in the wordwrap function
+		$cutmarker = "**cut_here**";
+
+		// Checking if the given string is longer than $maxlength
+		if( strlen( $string ) > $maxlength )
+		{
+
+			// Using wordwrap() to set the cutmarker
+			// NOTE: wordwrap (PHP 4 >= 4.0.2, PHP 5)
+			$string = wordwrap( $string, $maxlength, $cutmarker );
+
+			// Exploding the string at the cutmarker, set by wordwrap()
+			$string = explode( $cutmarker, $string );
+
+			// Adding $extension to the first value of the array $string, returned by explode()
+			$string = $string[ 0 ] . $extension;
+		}
+
+		// returning $string
+		return $string;
+	}
+
+	/**
+	 * Increments a given string by given interval.
+	 * An optional array with forbidden return values may be passed.
+	 *
+	 * @param string $string    String to Increment
+	 * @param int    $increment Increment value, 1 by default
+	 * @param array  $forbidden Array with strings the function must not return.
+	 *
+	 * @return string Incremented string
+	 * @uses    String_Increment()
+	 * @author  Carsten Witt <carsten.witt@gmail.com>
+	 * @version 20060706-2230
+	 * @link    http://www.emoticode.net/php/increment-string.html
+	 *
+	 * @return string
+	 */
+	public static function increment( $string, $increment = 1, $forbidden = array() )
+	{
+		$regex = "(_?)([0-9]+)$";
+		ereg( $regex, $string, $regs );
+		$z      = empty( $regs ) ? '' : $regs[ 2 ];
+		$neu    = ( (int)$z ) + $increment;
+		$string = ereg_replace( ( ( $z == '' ) ? "$" : $regs[ 0 ] . "$" ), ( (string)$regs[ 1 ] ) . ( (string)$neu ), $string );
+		if( in_array( $string, $forbidden ) )
+		{
+			$string = String_Increment( $string, $increment, $array );
+		}
+
+		return $string;
+	}
+
+	/**
+	 * Make a "SEO Friendly URL" string.
+	 *
+	 * @param $string
+	 *
+	 * @return string
+	 * @link http://www.emoticode.net/php/make-a-seo-friendly-url-string.html
+	 */
+	public static function niceUrl( $string )
+	{
+		$string = preg_replace( "`\[.*\]`U", "", $string );
+		$string = preg_replace( '`&(amp;)?#?[a-z0-9]+;`i', '-', $string );
+		$string = preg_replace( "`&([a-z])(acute|uml|circ|grave|ring|cedil|slash|tilde|caron|lig|quot|rsquo);`i", "\\1", $string );
+		$string = preg_replace( array( "`[^a-z0-9]`i", "`[-]+`" ), "-", $string );
+		$string = htmlentities( $string, ENT_COMPAT, 'utf-8' );
+
+		return strtolower( trim( $string, '-' ) );
+	}
+
+	/**
+	 * Convert string to underscore_name
+	 *
+	 * Converts "My House" to "my_house".
+	 * Converts " Peter's nice car " to "peters_nice_car".
+	 * Converts "_88" to "88"
+	 *
+	 * @param $string
+	 *
+	 * @return mixed|string
+	 * @link http://www.emoticode.net/php/convert-string-to-underscore_name.html
+	 */
+	public static function toUnderscore( $string )
+	{
+		$string = preg_replace( '/[\'"]/', '', $string );
+		$string = preg_replace( '/[^a-zA-Z0-9]+/', '_', $string );
+		$string = trim( $string, '_' );
+		$string = strtolower( $string );
+
+		return $string;
+	}
 }

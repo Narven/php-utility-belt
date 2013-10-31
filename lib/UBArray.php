@@ -307,4 +307,14 @@ class UBArray
 		return true;
 	}
 
+	/**
+	 * object to array conversion
+	 *
+	 * @param $obj
+	 */
+	public static function objToArray( $obj )
+	{
+		json_decode( json_encode( $obj ), true );
+	}
+
 }

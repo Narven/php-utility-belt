@@ -162,7 +162,7 @@ class UBDatabase
 	 *
 	 * @author kvc
 	 *
-	 * @link @link https://github.com/kvz/kvzlib/blob/master/php/functions/mysqlBulk.inc.php
+	 * @link   @link https://github.com/kvz/kvzlib/blob/master/php/functions/mysqlBulk.inc.php
 	 *
 	 * @return float
 	 */
@@ -496,5 +496,41 @@ class UBDatabase
 
 		// Return queries per second
 		return $qps;
+	}
+
+	public static function sanitize( $input )
+	{
+		if( is_array( $input ) )
+		{
+			foreach( $input as $var => $val )
+			{
+				$output[ $var ] = self::sanitize( $val );
+			}
+		}
+		else
+		{
+			if( get_magic_quotes_gpc() )
+			{
+				$input = stripslashes( $input );
+			}
+			$input  = self::cleanInput( $input );
+			$output = mysql_real_escape_string( $input );
+		}
+
+		return $output;
+	}
+
+	private function cleanInput( $input )
+	{
+		$search = array(
+			'@<script[^>]*?>.*?</script>@si', // Strip out javascript
+			'@<[\/\!]*?[^<>]*?>@si', // Strip out HTML tags
+			'@<style[^>]*?>.*?</style>@siU', // Strip style tags properly
+			'@<![\s\S]*?--[ \t\n\r]*>@' // Strip multi-line comments
+		);
+
+		$output = preg_replace( $search, '', $input );
+
+		return $output;
 	}
 }
